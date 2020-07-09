@@ -64,3 +64,12 @@ sparsity = (
     100.0 * messages_bow.nnz /
         (messages_bow.shape[0] * messages_bow.shape[1])
 ) # 0.0794
+
+#TF-IDF
+from sklearn.feature_extraction.text import TfidfTransformer
+tfidf = TfidfTransformer().fit(messages_bow)
+tfidf.idf_[bow_transformer.vocabulary_['u']] # 3.28
+tfidf.idf_[bow_transformer.vocabulary_['university']] # 8.52
+
+messages_tfidf = tfidf.transform(messages_bow)
+messages_tfidf.shape # (55572, 11425)
