@@ -1,3 +1,9 @@
+"""
+Glossary:
+bow: Bag of words
+tfidf: Term Frequency - Inverse Document Frequency
+"""
+
 import nltk
 import pandas as pd
 
@@ -93,3 +99,37 @@ print(cr)
 precision = tp / (tp + fp)
 recall = tp / (tp + fn)
 accuracy = (tp + tn) / (fp + fn + tp + tn)
+
+
+# Use train test split
+from sklearn.model_selection import train_test_split
+
+X = messages['message']
+y = messages['label']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+len(X_train) # 4457
+len(X_test) # 1115
+len(y_train) # 4457
+len(y_test) # 1115
+
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    # strings to token counts
+    ('bow', CountVectorizer(analyzer=text_process)),
+    # integer counts to weighted TF-IDF scores
+    ('tfidf', TfidfTransformer()),
+    # train on TF-IDF vectors w/ Naive Bayes Classifier
+    ('classifier', MultinomialNB())
+])
+
+pipeline.fit(X_train, y_train)
+
+y_pred = pipeline.predict(X_test)
+
+cr_pipe = classification_report(y_test, y_pred)
+print(cr_pipe)
+
+[tn, fp], [fn, tp] = confusion_matrix(y_test, y_pred)
+accuracy = (tp + tn) / (tn + fp + fn + tp) # 0.96
