@@ -73,3 +73,23 @@ tfidf.idf_[bow_transformer.vocabulary_['university']] # 8.52
 
 messages_tfidf = tfidf.transform(messages_bow)
 messages_tfidf.shape # (55572, 11425)
+
+# Training model
+from sklearn.naive_bayes import MultinomialNB
+
+spam_detect_model = MultinomialNB().fit(messages_tfidf, messages['label'])
+
+# Prediction
+y_true = messages['label']
+y_pred = spam_detect_model.predict(messages_tfidf)
+
+# Evaluation
+from sklearn.metrics import classification_report, confusion_matrix
+
+cr = classification_report(y_true, y_pred)
+print(cr)
+
+[tn, fp], [fn, tp] = confusion_matrix(y_true, y_pred)
+precision = tp / (tp + fp)
+recall = tp / (tp + fn)
+accuracy = (tp + tn) / (fp + fn + tp + tn)
